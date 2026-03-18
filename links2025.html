@@ -45,6 +45,8 @@
       padding: 15px;
       margin-top: 40px;
     }
+
+    
   </style>
 </head>
 <body>
@@ -78,5 +80,67 @@
       });
     });
   </script>
+  <canvas id="pacmanEffect"></canvas>
+  <script>
+    const canvas = document.getElementById("pacmanEffect");
+    const ctx = canvas.getContext("2d");
+  
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = "fixed";
+    canvas.style.top = "0";
+    canvas.style.left = "0";
+    canvas.style.pointerEvents = "none"; // não atrapalha cliques
+    canvas.style.zIndex = "9999"; // fica por cima
+  
+    function animatePacmanOver(element, url) {
+      const rect = element.getBoundingClientRect();
+      let pacX = -40;
+      let pacY = rect.top + rect.height / 2;
+      let mouthOpen = true;
+      let angle = 0;
+  
+      function drawPacman() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "yellow";
+        ctx.beginPath();
+        let mouthAngle = mouthOpen ? 0.3 : 0.05;
+        ctx.moveTo(pacX, pacY);
+        ctx.arc(pacX, pacY, 20, mouthAngle * Math.PI, (2 - mouthAngle) * Math.PI);
+        ctx.closePath();
+        ctx.fill();
+  
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.arc(pacX, pacY - 8, 3, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+  
+      function update() {
+        pacX += 8;
+        angle++;
+        if (angle % 10 === 0) mouthOpen = !mouthOpen;
+  
+        if (pacX > rect.right + 40) {
+          // limpar e redirecionar
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          window.location.href = url;
+          return;
+        }
+        drawPacman();
+        requestAnimationFrame(update);
+      }
+      update();
+    }
+  
+    // intercepta cliques nos links
+    document.querySelectorAll(".links a").forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        animatePacmanOver(link, link.href);
+      });
+    });
+  </script>
+  
 </body>
 </html>
